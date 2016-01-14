@@ -331,6 +331,9 @@
   <data name="HtmlGeneration_ValueMustBeNumber" xml:space="preserve">
     <value>The field {0} must be a number.</value>
   </data>
+  <data name="DependencyContextNotFound" xml:space="preserve">
+    <value>Entry assembly was compiled without `preserveCompilationContext` enabled.</value>
+  </data>
   <data name="TextInputFormatter_SupportedEncodingsMustNotBeEmpty" xml:space="preserve">
     <value>The list of '{0}' must not be empty. Add at least one supported encoding.</value>
   </data>

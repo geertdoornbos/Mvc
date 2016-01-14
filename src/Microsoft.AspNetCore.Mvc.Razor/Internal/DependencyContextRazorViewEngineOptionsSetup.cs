@@ -18,7 +18,8 @@ namespace Microsoft.AspNetCore.Mvc.Razor.Internal
         /// <summary>
         /// Initializes a new instance of <see cref="DependencyContextRazorViewEngineOptionsSetup"/>.
         /// </summary>
-        public DependencyContextRazorViewEngineOptionsSetup() : this(DependencyContext.Default)
+        public DependencyContextRazorViewEngineOptionsSetup()
+            : this(DependencyContext.Default)
         {
         }
 
@@ -26,19 +27,20 @@ namespace Microsoft.AspNetCore.Mvc.Razor.Internal
         /// Initializes a new instance of <see cref="DependencyContextRazorViewEngineOptionsSetup"/>.
         /// </summary>
         /// <param name="dependencyContext"><see cref="DependencyContext"/> to use as compilation and parse option source.</param>
-        public DependencyContextRazorViewEngineOptionsSetup(DependencyContext dependencyContext) : base(options => ConfigureRazor(options, dependencyContext))
+        public DependencyContextRazorViewEngineOptionsSetup(DependencyContext dependencyContext) 
+            : base(options => ConfigureRazor(options, dependencyContext))
         {
         }
 
         private static void ConfigureRazor(RazorViewEngineOptions options, DependencyContext dependencyContext)
         {
-            var compilationOptions = dependencyContext.CompilationOptions;
+            var compilationOptions = dependencyContext?.CompilationOptions ?? Extensions.DependencyModel.CompilationOptions.Default;
 
             SetParseOptions(options, compilationOptions);
             SetCompilationOptions(options, compilationOptions);
         }
 
-        private static void SetCompilationOptions(RazorViewEngineOptions options, Microsoft.Extensions.DependencyModel.CompilationOptions compilationOptions)
+        private static void SetCompilationOptions(RazorViewEngineOptions options, Extensions.DependencyModel.CompilationOptions compilationOptions)
         {
             var roslynOptions = options.CompilationOptions;
 
@@ -71,7 +73,7 @@ namespace Microsoft.AspNetCore.Mvc.Razor.Internal
             options.CompilationOptions = roslynOptions;
         }
 
-        private static void SetParseOptions(RazorViewEngineOptions options, Microsoft.Extensions.DependencyModel.CompilationOptions compilationOptions)
+        private static void SetParseOptions(RazorViewEngineOptions options, Extensions.DependencyModel.CompilationOptions compilationOptions)
         {
             var roslynParseOptions = options.ParseOptions;
             roslynParseOptions = roslynParseOptions.WithPreprocessorSymbols(compilationOptions.Defines);

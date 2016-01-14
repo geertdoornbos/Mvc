@@ -203,4 +203,7 @@
   <data name="LayoutHasCircularReference" xml:space="preserve">
     <value>A circular layout reference was detected when rendering '{0}'. The layout page '{1}' has already been rendered.</value>
   </data>
+  <data name="DependencyContextNotFound" xml:space="preserve">
+    <value>Entry assembly was compiled without `preserveCompilationContext` enabled.</value>
+  </data>
 </root>

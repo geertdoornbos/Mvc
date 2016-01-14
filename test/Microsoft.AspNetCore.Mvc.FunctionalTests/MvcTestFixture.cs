@@ -10,8 +10,6 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.AspNetCore.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Testing;
 using Microsoft.Extensions.PlatformAbstractions;
 
 namespace Microsoft.AspNetCore.Mvc.FunctionalTests

@@ -462,6 +462,22 @@ namespace Microsoft.AspNetCore.Mvc.Razor
             return string.Format(CultureInfo.CurrentCulture, GetString("LayoutHasCircularReference"), p0, p1);
         }
 
+        /// <summary>
+        /// Entry assembly was compiled without `preserveCompilationContext` enabled.
+        /// </summary>
+        internal static string DependencyContextNotFound
+        {
+            get { return GetString("DependencyContextNotFound"); }
+        }
+
+        /// <summary>
+        /// Entry assembly was compiled without `preserveCompilationContext` enabled.
+        /// </summary>
+        internal static string FormatDependencyContextNotFound()
+        {
+            return GetString("DependencyContextNotFound");
+        }
+
         private static string GetString(string name, params string[] formatterNames)
         {
             var value = _resourceManager.GetString(name);

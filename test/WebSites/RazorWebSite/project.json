@@ -27,6 +27,10 @@
         "define": [
           "DNXCORE50_CUSTOM_DEFINE"
         ]
+      },
+      "imports": "portable-net451+win8",
+      "dependencies": {
+        "Microsoft.NETCore.Platforms": "1.0.1-*"
       }
     }
   }

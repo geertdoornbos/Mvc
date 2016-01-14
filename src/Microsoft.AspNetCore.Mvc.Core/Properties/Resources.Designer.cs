@@ -1099,6 +1099,22 @@ namespace Microsoft.AspNetCore.Mvc.Core
         }
 
         /// <summary>
+        /// Entry assembly was compiled without `preserveCompilationContext` enabled.
+        /// </summary>
+        internal static string DependencyContextNotFound
+        {
+            get { return GetString("DependencyContextNotFound"); }
+        }
+
+        /// <summary>
+        /// Entry assembly was compiled without `preserveCompilationContext` enabled.
+        /// </summary>
+        internal static string FormatDependencyContextNotFound()
+        {
+            return GetString("DependencyContextNotFound");
+        }
+
+        /// <summary>
         /// The list of '{0}' must not be empty. Add at least one supported encoding.
         /// </summary>
         internal static string TextInputFormatter_SupportedEncodingsMustNotBeEmpty

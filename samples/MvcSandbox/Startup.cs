@@ -19,7 +19,7 @@ namespace MvcSandbox
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
-
+            app.UseDeveloperExceptionPage();
             app.UseStaticFiles();
             loggerFactory.AddConsole();
             app.UseMvc(routes =>
@@ -36,6 +36,7 @@ namespace MvcSandbox
                 .UseDefaultConfiguration(args)
                 .UseIISPlatformHandlerUrl()
                 .UseStartup<Startup>()
+                .UseServer("Microsoft.AspNetCore.Server.Kestrel")
                 .Build();
 
             host.Run();

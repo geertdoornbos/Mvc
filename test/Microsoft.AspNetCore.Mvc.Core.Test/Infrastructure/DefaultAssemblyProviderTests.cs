@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.PlatformAbstractions;
 using Moq;
 using Xunit;
@@ -16,17 +15,22 @@ namespace Microsoft.AspNetCore.Mvc.Infrastructure
         [Fact]
         public void CandidateAssemblies_IgnoresMvcAssemblies()
         {
+            if (DnxPlatformServices.Default?.LibraryManager == null)
+            {
+                return;
+            }
+
             // Arrange
             var manager = new Mock<ILibraryManager>();
             manager.Setup(f => f.GetReferencingLibraries(It.IsAny<string>()))
-                   .Returns(new[]
-                   {
-                        new Library("Microsoft.AspNetCore.Mvc.Core"),
-                        new Library("Microsoft.AspNetCore.Mvc"),
-                        new Library("Microsoft.AspNetCore.Mvc.Abstractions"),
-                        new Library("SomeRandomAssembly"),
-                   })
-                   .Verifiable();
+                .Returns(new[]
+                {
+                    new Library("Microsoft.AspNetCore.Mvc.Core"),
+                    new Library("Microsoft.AspNetCore.Mvc"),
+                    new Library("Microsoft.AspNetCore.Mvc.Abstractions"),
+                    new Library("SomeRandomAssembly"),
+                })
+                .Verifiable();
             var provider = new TestAssemblyProvider(manager.Object);
 
             // Act
@@ -34,23 +38,26 @@ namespace Microsoft.AspNetCore.Mvc.Infrastructure
 
             // Assert
             Assert.Equal(new[] { "SomeRandomAssembly" }, candidates.Select(a => a.Name));
-
-            var context = new Mock<HttpContext>();
         }
 
         [Fact]
         public void CandidateAssemblies_ReturnsLibrariesReferencingAnyMvcAssembly()
         {
+            if (DnxPlatformServices.Default?.LibraryManager == null)
+            {
+                return;
+            }
+
             // Arrange
             var manager = new Mock<ILibraryManager>();
             manager.Setup(f => f.GetReferencingLibraries(It.IsAny<string>()))
-                  .Returns(Enumerable.Empty<Library>());
+                .Returns(Enumerable.Empty<Library>());
             manager.Setup(f => f.GetReferencingLibraries("Microsoft.AspNetCore.Mvc.Core"))
-                   .Returns(new[] { new Library("Foo") });
+                .Returns(new[] { new Library("Foo") });
             manager.Setup(f => f.GetReferencingLibraries("Microsoft.AspNetCore.Mvc.Abstractions"))
-                   .Returns(new[] { new Library("Bar") });
+                .Returns(new[] { new Library("Bar") });
             manager.Setup(f => f.GetReferencingLibraries("Microsoft.AspNetCore.Mvc"))
-                   .Returns(new[] { new Library("Baz") });
+                .Returns(new[] { new Library("Baz") });
             var provider = new TestAssemblyProvider(manager.Object);
 
             // Act
@@ -63,6 +70,11 @@ namespace Microsoft.AspNetCore.Mvc.Infrastructure
         [Fact]
         public void CandidateAssemblies_ReturnsLibrariesReferencingDefaultAssemblies()
         {
+            if (DnxPlatformServices.Default?.LibraryManager == null)
+            {
+                return;
+            }
+
             // Arrange
             var defaultProvider = new TestAssemblyProvider(CreateLibraryManager());
 
@@ -76,6 +88,11 @@ namespace Microsoft.AspNetCore.Mvc.Infrastructure
         [Fact]
         public void CandidateAssemblies_ReturnsLibrariesReferencingOverriddenAssemblies()
         {
+            if (DnxPlatformServices.Default?.LibraryManager == null)
+            {
+                return;
+            }
+
             // Arrange
             var overriddenProvider = new OverriddenAssemblyProvider(CreateLibraryManager());
 
@@ -89,6 +106,11 @@ namespace Microsoft.AspNetCore.Mvc.Infrastructure
         [Fact]
         public void CandidateAssemblies_ReturnsEmptySequenceWhenReferenceAssembliesIsNull()
         {
+            if (DnxPlatformServices.Default?.LibraryManager == null)
+            {
+                return;
+            }
+
             // Arrange
             var nullProvider = new NullAssemblyProvider(CreateLibraryManager());
 
@@ -105,6 +127,11 @@ namespace Microsoft.AspNetCore.Mvc.Infrastructure
         [Fact]
         public void ReferenceAssemblies_ReturnsLoadableReferenceAssemblies()
         {
+            if (DnxPlatformServices.Default?.LibraryManager == null)
+            {
+                return;
+            }
+
             // Arrange
             var provider = new MvcAssembliesTestingProvider();
             var expected = provider.LoadableReferenceAssemblies.OrderBy(p => p, StringComparer.Ordinal);
@@ -120,13 +147,13 @@ namespace Microsoft.AspNetCore.Mvc.Infrastructure
         {
             var manager = new Mock<ILibraryManager>();
             manager.Setup(f => f.GetReferencingLibraries(It.IsAny<string>()))
-                  .Returns(Enumerable.Empty<Library>());
+                .Returns(Enumerable.Empty<Library>());
             manager.Setup(f => f.GetReferencingLibraries("Microsoft.AspNetCore.Mvc.Core"))
-                   .Returns(new[] { new Library("Baz") });
+                .Returns(new[] { new Library("Baz") });
             manager.Setup(f => f.GetReferencingLibraries("MyAssembly"))
-                   .Returns(new[] { new Library("Foo") });
+                .Returns(new[] { new Library("Foo") });
             manager.Setup(f => f.GetReferencingLibraries("AnotherAssembly"))
-                   .Returns(new[] { new Library("Bar") });
+                .Returns(new[] { new Library("Bar") });
             return manager.Object;
         }
 

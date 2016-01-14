@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using Microsoft.AspNetCore.Mvc.Core;
 using Microsoft.Extensions.DependencyModel;
 
 namespace Microsoft.AspNetCore.Mvc.Infrastructure
@@ -59,6 +60,11 @@ namespace Microsoft.AspNetCore.Mvc.Infrastructure
             if (ReferenceAssemblies == null)
             {
                 return Enumerable.Empty<RuntimeLibrary>();
+            }
+
+            if (DependencyContext.Default == null)
+            {
+                throw new InvalidOperationException(Resources.DependencyContextNotFound);
             }
 
             return DependencyContext.Default.RuntimeLibraries.Where(IsCandidateLibrary);
