@@ -28,7 +28,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
             Assert.IsType(typeof(AnotherTestOutputFormatter), formatter);
         }
 
-        private class TestOutputFormatter : OutputFormatter
+        private class TestOutputFormatter : TextOutputFormatter
         {
             public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
             {
@@ -36,7 +36,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
             }
         }
 
-        private class AnotherTestOutputFormatter : OutputFormatter
+        private class AnotherTestOutputFormatter : TextOutputFormatter
         {
             public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
             {

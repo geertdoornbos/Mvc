@@ -20,7 +20,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
     /// This class handles serialization of objects
     /// to XML using <see cref="DataContractSerializer"/>
     /// </summary>
-    public class XmlDataContractSerializerOutputFormatter : OutputFormatter
+    public class XmlDataContractSerializerOutputFormatter : TextOutputFormatter
     {
         private DataContractSerializerSettings _serializerSettings;
         private ConcurrentDictionary<Type, object> _serializerCache = new ConcurrentDictionary<Type, object>();

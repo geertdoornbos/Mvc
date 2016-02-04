@@ -16,7 +16,7 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.Mvc.Formatters
 {
-    public class OutputFormatterTests
+    public class TextOutputFormatterTests
     {
         public static IEnumerable<object[]> SelectResponseCharacterEncodingData
         {
@@ -80,7 +80,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
             string expectedContentType)
         {
             // Arrange
-            var formatter = new Mock<OutputFormatter>();
+            var formatter = new Mock<TextOutputFormatter>();
 
             formatter
                 .Setup(f => f.SelectCharacterEncoding(It.IsAny<OutputFormatterWriteContext>()))
@@ -378,7 +378,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
             Assert.Null(contentTypes);
         }
 
-        private class TypeSpecificFormatter : OutputFormatter
+        private class TypeSpecificFormatter : TextOutputFormatter
         {
             public List<Type> SupportedTypes { get; } = new List<Type>();
 
@@ -393,7 +393,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
             }
         }
 
-        private class TestOutputFormatter : OutputFormatter
+        private class TestOutputFormatter : TextOutputFormatter
         {
             public TestOutputFormatter()
             {
@@ -406,7 +406,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
             }
         }
 
-        private class DoesNotSetContext : OutputFormatter
+        private class DoesNotSetContext : TextOutputFormatter
         {
             public DoesNotSetContext()
             {
@@ -427,7 +427,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
             }
         }
 
-        private class PngImageFormatter : OutputFormatter
+        private class PngImageFormatter : TextOutputFormatter
         {
             public PngImageFormatter()
             {

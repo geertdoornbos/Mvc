@@ -13,7 +13,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
     /// <summary>
     /// Always writes a string value to the response, regardless of requested content type.
     /// </summary>
-    public class StringOutputFormatter : OutputFormatter
+    public class StringOutputFormatter : TextOutputFormatter
     {
         public StringOutputFormatter()
         {

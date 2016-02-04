@@ -15,7 +15,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
     /// <summary>
     /// An output formatter that specializes in writing JSON content.
     /// </summary>
-    public class JsonOutputFormatter : OutputFormatter
+    public class JsonOutputFormatter : TextOutputFormatter
     {
         private readonly IArrayPool<char> _charPool;
 

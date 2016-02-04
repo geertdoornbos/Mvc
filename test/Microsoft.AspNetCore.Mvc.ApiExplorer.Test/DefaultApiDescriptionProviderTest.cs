@@ -1484,7 +1484,7 @@ namespace Microsoft.AspNetCore.Mvc.Description
             }
         }
 
-        private class MockOutputFormatter : OutputFormatter
+        private class MockOutputFormatter : TextOutputFormatter
         {
             public List<Type> SupportedTypes { get; } = new List<Type>();
 

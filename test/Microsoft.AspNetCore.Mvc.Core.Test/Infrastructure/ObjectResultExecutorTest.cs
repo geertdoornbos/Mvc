@@ -520,7 +520,7 @@ namespace Microsoft.AspNetCore.Mvc.Internal
             }
         }
 
-        private class TestJsonOutputFormatter : OutputFormatter
+        private class TestJsonOutputFormatter : TextOutputFormatter
         {
             public TestJsonOutputFormatter()
             {
@@ -536,7 +536,7 @@ namespace Microsoft.AspNetCore.Mvc.Internal
             }
         }
 
-        private class TestXmlOutputFormatter : OutputFormatter
+        private class TestXmlOutputFormatter : TextOutputFormatter
         {
             public TestXmlOutputFormatter()
             {
@@ -552,7 +552,7 @@ namespace Microsoft.AspNetCore.Mvc.Internal
             }
         }
 
-        private class TestStringOutputFormatter : OutputFormatter
+        private class TestStringOutputFormatter : TextOutputFormatter
         {
             public TestStringOutputFormatter()
             {

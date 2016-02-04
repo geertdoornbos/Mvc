@@ -15,7 +15,7 @@ namespace BasicWebSite.Formatters
     /// <summary>
     /// Provides contact information of a person through VCard format.
     /// </summary>
-    public class VCardFormatter_V3 : OutputFormatter
+    public class VCardFormatter_V3 : TextOutputFormatter
     {
         public VCardFormatter_V3()
         {

@@ -9,7 +9,7 @@ using Microsoft.Net.Http.Headers;
 
 namespace FormatFilterSample.Web
 {
-    public class CustomFormatter : OutputFormatter
+    public class CustomFormatter : TextOutputFormatter
     {
         public CustomFormatter(string contentType)
         {

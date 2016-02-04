@@ -9,7 +9,7 @@ using Microsoft.Net.Http.Headers;
 
 namespace BasicWebSite.Formatters
 {
-    public class CustomFormatter : OutputFormatter
+    public class CustomFormatter : TextOutputFormatter
     {
         public string ContentType { get; private set; }
 

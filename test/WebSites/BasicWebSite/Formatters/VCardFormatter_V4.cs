@@ -16,7 +16,7 @@ namespace BasicWebSite.Formatters
     /// Provides contact information of a person through VCard format.
     /// In version 4.0 of VCard format, Gender is a supported property.
     /// </summary>
-    public class VCardFormatter_V4 : OutputFormatter
+    public class VCardFormatter_V4 : TextOutputFormatter
     {
         public VCardFormatter_V4()
         {

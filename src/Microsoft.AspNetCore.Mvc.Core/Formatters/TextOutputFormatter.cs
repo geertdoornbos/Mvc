@@ -16,14 +16,14 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
     /// <summary>
     /// Writes an object to the output stream.
     /// </summary>
-    public abstract class OutputFormatter : IOutputFormatter, IApiResponseFormatMetadataProvider
+    public abstract class TextOutputFormatter : IOutputFormatter, IApiResponseFormatMetadataProvider
     {
         private IDictionary<string, string> _outputMediaTypeCache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OutputFormatter"/> class.
         /// </summary>
-        protected OutputFormatter()
+        protected TextOutputFormatter()
         {
             SupportedEncodings = new List<Encoding>();
             SupportedMediaTypes = new MediaTypeCollection();
