@@ -28,7 +28,7 @@ namespace BasicWebSite.Formatters
             return typeof(Contact).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo());
         }
 
-        public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
+        public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
         {
             var contact = (Contact)context.Object;
 
@@ -37,8 +37,6 @@ namespace BasicWebSite.Formatters
             builder.AppendFormat("FN:{0}", contact.Name);
             builder.AppendLine();
             builder.AppendLine("END:VCARD");
-
-            var selectedEncoding = new MediaType(context.ContentType).Encoding ?? Encoding.UTF8;
 
             await context.HttpContext.Response.WriteAsync(
                 builder.ToString(),

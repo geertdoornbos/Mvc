@@ -46,7 +46,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
             return false;
         }
 
-        public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
+        public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
         {
             if (context == null)
             {
@@ -60,7 +60,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
             }
 
             var response = context.HttpContext.Response;
-            return response.WriteAsync(valueAsString, MediaType.GetEncoding(response.ContentType) ?? Encoding.UTF8);
+            return response.WriteAsync(valueAsString, selectedEncoding);
         }
     }
 }

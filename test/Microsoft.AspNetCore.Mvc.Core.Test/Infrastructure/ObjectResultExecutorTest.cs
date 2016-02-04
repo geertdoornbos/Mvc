@@ -530,7 +530,7 @@ namespace Microsoft.AspNetCore.Mvc.Internal
                 SupportedEncodings.Add(Encoding.UTF8);
             }
 
-            public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
+            public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
             {
                 return Task.FromResult(0);
             }
@@ -546,7 +546,7 @@ namespace Microsoft.AspNetCore.Mvc.Internal
                 SupportedEncodings.Add(Encoding.UTF8);
             }
 
-            public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
+            public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
             {
                 return Task.FromResult(0);
             }
@@ -561,7 +561,7 @@ namespace Microsoft.AspNetCore.Mvc.Internal
                 SupportedEncodings.Add(Encoding.UTF8);
             }
 
-            public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
+            public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
             {
                 return Task.FromResult(0);
             }

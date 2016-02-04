@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -30,7 +31,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
 
         private class TestOutputFormatter : TextOutputFormatter
         {
-            public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
+            public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
             {
                 throw new NotImplementedException();
             }
@@ -38,7 +39,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
 
         private class AnotherTestOutputFormatter : TextOutputFormatter
         {
-            public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
+            public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
             {
                 throw new NotImplementedException();
             }

@@ -155,7 +155,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
         }
 
         /// <inheritdoc />
-        public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
+        public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
         {
             if (context == null)
             {
@@ -165,7 +165,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
             var response = context.HttpContext.Response;
 
             var writerSettings = WriterSettings.Clone();
-            writerSettings.Encoding = MediaType.GetEncoding(context.ContentType) ?? Encoding.UTF8;
+            writerSettings.Encoding = selectedEncoding;
 
             // Wrap the object only if there is a wrapping type.
             var value = context.Object;

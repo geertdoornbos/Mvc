@@ -29,7 +29,7 @@ namespace BasicWebSite.Formatters
             return typeof(Contact).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo());
         }
 
-        public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
+        public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
         {
             var contact = (Contact)context.Object;
 
@@ -40,8 +40,6 @@ namespace BasicWebSite.Formatters
             builder.AppendFormat("GENDER:{0}", (contact.Gender == GenderType.Male) ? "M" : "F");
             builder.AppendLine();
             builder.AppendLine("END:VCARD");
-
-            var selectedEncoding = new MediaType(context.ContentType).Encoding ?? Encoding.UTF8;
 
             await context.HttpContext.Response.WriteAsync(
                 builder.ToString(),

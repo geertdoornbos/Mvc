@@ -132,16 +132,9 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
             return _serializer;
         }
 
-        public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
+        public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
             var response = context.HttpContext.Response;
-            var selectedEncoding = MediaType.GetEncoding(context.ContentType) ?? Encoding.UTF8;
-
             using (var writer = context.WriterFactory(response.Body, selectedEncoding))
             {
                 WriteObject(writer, context.Object);

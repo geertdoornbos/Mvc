@@ -387,7 +387,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
                 return SupportedTypes.Contains(type);
             }
 
-            public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
+            public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
             {
                 throw new NotImplementedException();
             }
@@ -400,7 +400,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
                 SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("application/acceptCharset"));
             }
 
-            public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
+            public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
             {
                 return Task.FromResult(true);
             }
@@ -421,7 +421,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
                 return true;
             }
 
-            public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
+            public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
             {
                 return Task.FromResult(true);
             }
@@ -435,7 +435,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
                 SupportedEncodings.Add(Encoding.UTF8);
             }
 
-            public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
+            public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
             {
                 return Task.FromResult(true);
             }

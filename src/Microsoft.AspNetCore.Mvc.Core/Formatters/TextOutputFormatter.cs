@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Core;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
@@ -16,7 +15,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
     /// <summary>
     /// Writes an object to the output stream.
     /// </summary>
-    public abstract class TextOutputFormatter : IOutputFormatter, IApiResponseFormatMetadataProvider
+    public abstract class TextOutputFormatter : OutputFormatter
     {
         private IDictionary<string, string> _outputMediaTypeCache;
 
@@ -26,7 +25,6 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
         protected TextOutputFormatter()
         {
             SupportedEncodings = new List<Encoding>();
-            SupportedMediaTypes = new MediaTypeCollection();
         }
 
         /// <summary>
@@ -35,12 +33,6 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
         /// used when writing the data.
         /// </summary>
         public IList<Encoding> SupportedEncodings { get; }
-
-        /// <summary>
-        /// Gets the mutable collection of media type elements supported by
-        /// this <see cref="OutputFormatter"/>.
-        /// </summary>
-        public MediaTypeCollection SupportedMediaTypes { get; }
 
         private IDictionary<string, string> OutputMediaTypeCache
         {
@@ -60,58 +52,6 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
                 }
 
                 return _outputMediaTypeCache;
-            }
-        }
-
-
-        /// <summary>
-        /// Returns a value indicating whether or not the given type can be written by this serializer.
-        /// </summary>
-        /// <param name="type">The object type.</param>
-        /// <returns><c>true</c> if the type can be written, otherwise <c>false</c>.</returns>
-        protected virtual bool CanWriteType(Type type)
-        {
-            return true;
-        }
-
-        /// <inheritdoc />
-        public virtual IReadOnlyList<string> GetSupportedContentTypes(
-            string contentType,
-            Type objectType)
-        {
-            if (!CanWriteType(objectType))
-            {
-                return null;
-            }
-
-            if (contentType == null)
-            {
-                // If contentType is null, then any type we support is valid.
-                return SupportedMediaTypes.Count > 0 ? SupportedMediaTypes : null;
-            }
-            else
-            {
-                List<string> mediaTypes = null;
-
-                var parsedContentType = new MediaType(contentType);
-
-                // Confirm this formatter supports a more specific media type than requested e.g. OK if "text/*"
-                // requested and formatter supports "text/plain". Treat contentType like it came from an Accept header.
-                foreach (var mediaType in SupportedMediaTypes)
-                {
-                    var parsedMediaType = new MediaType(mediaType);
-                    if (parsedMediaType.IsSubsetOf(parsedContentType))
-                    {
-                        if (mediaTypes == null)
-                        {
-                            mediaTypes = new List<string>();
-                        }
-
-                        mediaTypes.Add(mediaType);
-                    }
-                }
-
-                return mediaTypes;
             }
         }
 
@@ -154,59 +94,11 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
                 }
             }
 
-            // A formatter for a non-text media-type won't have any supported encodings.
             return SupportedEncodings.Count > 0 ? SupportedEncodings[0] : null;
         }
 
         /// <inheritdoc />
-        public virtual bool CanWriteResult(OutputFormatterCanWriteContext context)
-        {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            if (!CanWriteType(context.ObjectType))
-            {
-                return false;
-            }
-
-            if (!context.ContentType.HasValue)
-            {
-                // If the desired content type is set to null, then the current formatter can write anything
-                // it wants.
-                if (SupportedMediaTypes.Count > 0)
-                {
-                    context.ContentType = new StringSegment(SupportedMediaTypes[0]);
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                // Confirm this formatter supports a more specific media type than requested e.g. OK if "text/*"
-                // requested and formatter supports "text/plain". contentType is typically what we got in an Accept
-                // header.
-                var parsedContentType = new MediaType(context.ContentType);
-                for (var i = 0; i < SupportedMediaTypes.Count; i++)
-                {
-                    var supportedMediaType = new MediaType(SupportedMediaTypes[i]);
-                    if (supportedMediaType.IsSubsetOf(parsedContentType))
-                    {
-                        context.ContentType = new StringSegment(SupportedMediaTypes[i]);
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
-
-        /// <inheritdoc />
-        public Task WriteAsync(OutputFormatterWriteContext context)
+        public override Task WriteAsync(OutputFormatterWriteContext context)
         {
             if (context == null)
             {
@@ -227,15 +119,6 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
                 }
             }
 
-            // Note: Text-based media types will use an encoding/charset - binary formats just ignore it. We want to
-            // make this class work with media types that use encodings, and those that don't.
-            //
-            // The default implementation of SelectCharacterEncoding will read from the list of SupportedEncodings
-            // and will always choose a default encoding if any are supported. So, the only cases where the
-            // selectedEncoding can be null are:
-            //
-            // 1). No supported encodings - we assume this is a non-text format
-            // 2). Custom implementation of SelectCharacterEncoding - trust the user and give them what they want.
             var selectedEncoding = SelectCharacterEncoding(context);
             if (selectedEncoding != null)
             {
@@ -247,30 +130,23 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
             context.ContentType = selectedMediaType;
 
             WriteResponseHeaders(context);
-            return WriteResponseBodyAsync(context);
+            return WriteResponseBodyAsync(context, selectedEncoding);
         }
 
-        /// <summary>
-        /// Sets the headers on <see cref="Microsoft.AspNetCore.Http.HttpResponse"/> object.
-        /// </summary>
-        /// <param name="context">The formatter context associated with the call.</param>
-        public virtual void WriteResponseHeaders(OutputFormatterWriteContext context)
+        /// <inheritdoc />
+        public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            var response = context.HttpContext.Response;
-            response.ContentType = context.ContentType.Value;
+            var encoding = MediaType.GetEncoding(context.ContentType);
+            await WriteResponseBodyAsync(context, encoding);
         }
 
         /// <summary>
         /// Writes the response body.
         /// </summary>
         /// <param name="context">The formatter context associated with the call.</param>
+        /// <param name="selectedEncoding">The <see cref="Encoding"/> that should be ued to write the response.</param>
         /// <returns>A task which can write the response body.</returns>
-        public abstract Task WriteResponseBodyAsync(OutputFormatterWriteContext context);
+        public abstract Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding);
 
         private string GetMediaTypeWithCharset(string mediaType, Encoding encoding)
         {

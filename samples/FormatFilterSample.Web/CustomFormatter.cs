@@ -38,7 +38,7 @@ namespace FormatFilterSample.Web
             return false;
         }
 
-        public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
+        public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
         {
             var response = context.HttpContext.Response;
             await response.WriteAsync(context.Object.ToString());

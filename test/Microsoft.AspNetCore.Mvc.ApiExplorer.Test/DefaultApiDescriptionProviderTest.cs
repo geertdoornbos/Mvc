@@ -1488,7 +1488,7 @@ namespace Microsoft.AspNetCore.Mvc.Description
         {
             public List<Type> SupportedTypes { get; } = new List<Type>();
 
-            public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
+            public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
             {
                 throw new NotImplementedException();
             }
