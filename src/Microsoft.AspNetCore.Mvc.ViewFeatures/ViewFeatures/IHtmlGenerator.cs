@@ -307,6 +307,8 @@ namespace Microsoft.AspNetCore.Mvc.ViewFeatures
             bool allowMultiple,
             object htmlAttributes);
 
+        IHtmlContent GenerateSelectGroupsAndOptions(string optionLabel, IEnumerable<SelectListItem> selectList);
+
         TagBuilder GenerateTextArea(
             ViewContext viewContext,
             ModelExplorer modelExplorer,

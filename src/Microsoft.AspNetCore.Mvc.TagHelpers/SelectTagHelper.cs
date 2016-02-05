@@ -18,6 +18,7 @@ namespace Microsoft.AspNetCore.Mvc.TagHelpers
     /// <see cref="ITagHelper"/> implementation targeting &lt;select&gt; elements with an <c>asp-for</c> attribute.
     /// </summary>
     [HtmlTargetElement("select", Attributes = ForAttributeName)]
+    [HtmlTargetElement("select", Attributes = ItemsAttributeName)]
     public class SelectTagHelper : TagHelper
     {
         private const string ForAttributeName = "asp-for";
@@ -70,6 +71,12 @@ namespace Microsoft.AspNetCore.Mvc.TagHelpers
                 throw new ArgumentNullException(nameof(context));
             }
 
+            if (Items != null && For == null)
+            {
+                context.Items[typeof(SelectTagHelper)] = null;
+                return;
+            }
+
             // Note null or empty For.Name is allowed because TemplateInfo.HtmlFieldPrefix may be sufficient.
             // IHtmlGenerator will enforce name requirements.
             if (For.Metadata == null)
@@ -118,6 +125,13 @@ namespace Microsoft.AspNetCore.Mvc.TagHelpers
 
             // Ensure GenerateSelect() _never_ looks anything up in ViewData.
             var items = Items ?? Enumerable.Empty<SelectListItem>();
+
+            if (For == null)
+            {
+                var options = Generator.GenerateSelectGroupsAndOptions(optionLabel: null, selectList: items);
+                output.PostContent.AppendHtml(options);
+                return;
+            }
 
             var tagBuilder = Generator.GenerateSelect(
                 ViewContext,
