@@ -7,11 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
-using Microsoft.AspNetCore.Mvc.TestCommon;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using Moq;
-using Moq.Protected;
 using Xunit;
 
 namespace Microsoft.AspNetCore.Mvc.Formatters
@@ -80,11 +78,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
             string expectedContentType)
         {
             // Arrange
-            var formatter = new Mock<TextOutputFormatter>();
-
-            formatter
-                .Setup(f => f.SelectCharacterEncoding(It.IsAny<OutputFormatterWriteContext>()))
-                .Returns(Encoding.UTF32);
+            var formatter = new OverrideEncodingFormatter(Encoding.UTF32);
 
             var formatterContext = new OutputFormatterWriteContext(
                 new DefaultHttpContext(),
@@ -96,7 +90,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
             };
 
             // Act
-            formatter.Object.WriteAsync(formatterContext);
+            formatter.WriteAsync(formatterContext);
 
             // Assert
             Assert.Equal(new StringSegment(expectedContentType), formatterContext.ContentType);
@@ -216,188 +210,11 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
             Assert.Equal(MediaTypeHeaderValue.Parse(testContentType.Value), context.HttpContext.Response.GetTypedHeaders().ContentType);
         }
 
-        [Fact]
-        public async Task WriteResponseHeaders_ClonesMediaType()
-        {
-            // Arrange
-            var formatter = new PngImageFormatter();
-            formatter.SupportedMediaTypes.Clear();
-            var mediaType = new MediaTypeHeaderValue("image/png");
-            formatter.SupportedMediaTypes.Add(mediaType);
-
-            var context = new OutputFormatterWriteContext(
-                new DefaultHttpContext(),
-                new TestHttpResponseStreamWriterFactory().CreateWriter,
-                objectType: null,
-                @object: null);
-
-            // Act
-            await formatter.WriteAsync(context);
-
-            // Assert
-            Assert.NotSame(mediaType, context.ContentType);
-            Assert.Null(mediaType.Charset);
-            Assert.Equal("image/png; charset=utf-8", context.ContentType.ToString());
-        }
-
-        [Fact]
-        public void CanWriteResult_ForNullContentType_UsesFirstEntryInSupportedContentTypes()
-        {
-            // Arrange
-            var context = new OutputFormatterWriteContext(
-                new DefaultHttpContext(),
-                new TestHttpResponseStreamWriterFactory().CreateWriter,
-                objectType: null,
-                @object: null);
-
-            var formatter = new TestOutputFormatter();
-
-            // Act
-            var result = formatter.CanWriteResult(context);
-
-            // Assert
-            Assert.True(result);
-            Assert.Equal(formatter.SupportedMediaTypes[0].ToString(), context.ContentType.ToString());
-        }
-
-        [Fact]
-        public void GetSupportedContentTypes_ReturnsNull_ForUnsupportedType()
-        {
-            // Arrange
-            var formatter = new TypeSpecificFormatter();
-            formatter.SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("application/json"));
-            formatter.SupportedTypes.Add(typeof(int));
-
-            // Act
-            var contentTypes = formatter.GetSupportedContentTypes(
-                contentType: null,
-                objectType: typeof(string));
-
-            // Assert
-            Assert.Null(contentTypes);
-        }
-
-        [Fact]
-        public void CanWrite_ReturnsFalse_ForUnsupportedType()
-        {
-            // Arrange
-            var formatter = new TypeSpecificFormatter();
-            formatter.SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("application/json"));
-            formatter.SupportedTypes.Add(typeof(int));
-
-            var context = new OutputFormatterWriteContext(
-                new DefaultHttpContext(),
-                new TestHttpResponseStreamWriterFactory().CreateWriter,
-                typeof(string),
-                "Hello, world!")
-            {
-                ContentType = new StringSegment(formatter.SupportedMediaTypes[0].ToString()),
-            };
-
-            // Act
-            var result = formatter.CanWriteResult(context);
-
-            // Assert
-            Assert.False(result);
-        }
-
-        [Fact]
-        public void GetSupportedContentTypes_ReturnsAllContentTypes_WithContentTypeNull()
-        {
-            // Arrange
-            var formatter = new TestOutputFormatter();
-            formatter.SupportedMediaTypes.Clear();
-            formatter.SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("application/json"));
-            formatter.SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("application/xml"));
-
-            // Act
-            var contentTypes = formatter.GetSupportedContentTypes(
-                contentType: null,
-                objectType: typeof(string));
-
-            // Assert
-            Assert.Equal(2, contentTypes.Count);
-            Assert.Single(contentTypes, ct => ct.ToString() == "application/json");
-            Assert.Single(contentTypes, ct => ct.ToString() == "application/xml");
-        }
-
-        [Fact]
-        public void GetSupportedContentTypes_ReturnsMatchingContentTypes_WithContentType()
-        {
-            // Arrange
-            var formatter = new TestOutputFormatter();
-
-            formatter.SupportedMediaTypes.Clear();
-            formatter.SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("application/json"));
-            formatter.SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("text/xml"));
-
-            // Act
-            var contentTypes = formatter.GetSupportedContentTypes(
-                "application/*",
-                typeof(int));
-
-            // Assert
-            var contentType = Assert.Single(contentTypes);
-            Assert.Equal("application/json", contentType.ToString());
-        }
-
-        [Fact]
-        public void GetSupportedContentTypes_ReturnsMatchingContentTypes_NoMatches()
-        {
-            // Arrange
-            var formatter = new TestOutputFormatter();
-
-            formatter.SupportedMediaTypes.Clear();
-            formatter.SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("application/json"));
-            formatter.SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("text/xml"));
-
-            // Act
-            var contentTypes = formatter.GetSupportedContentTypes(
-                "application/xml",
-                typeof(int));
-
-            // Assert
-            Assert.Null(contentTypes);
-        }
-
-        [Fact]
-        public void GetSupportedContentTypes_ReturnsAllContentTypes_ReturnsNullWithNoSupportedContentTypes()
-        {
-            // Arrange
-            var formatter = new TestOutputFormatter();
-
-            // Intentionally empty
-            formatter.SupportedMediaTypes.Clear();
-
-            // Act
-            var contentTypes = formatter.GetSupportedContentTypes(
-                contentType: null,
-                objectType: typeof(int));
-
-            // Assert
-            Assert.Null(contentTypes);
-        }
-
-        private class TypeSpecificFormatter : TextOutputFormatter
-        {
-            public List<Type> SupportedTypes { get; } = new List<Type>();
-
-            protected override bool CanWriteType(Type type)
-            {
-                return SupportedTypes.Contains(type);
-            }
-
-            public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
         private class TestOutputFormatter : TextOutputFormatter
         {
             public TestOutputFormatter()
             {
-                SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("application/acceptCharset"));
+                SupportedMediaTypes.Add("application/acceptCharset");
             }
 
             public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
@@ -406,33 +223,18 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
             }
         }
 
-        private class DoesNotSetContext : TextOutputFormatter
+        private class OverrideEncodingFormatter : TextOutputFormatter
         {
-            public DoesNotSetContext()
+            private readonly Encoding _encoding;
+
+            public OverrideEncodingFormatter(Encoding encoding)
             {
-                SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("application/doesNotSetContext"));
-                SupportedEncodings.Add(Encoding.Unicode);
+                _encoding = encoding;
             }
 
-            public override bool CanWriteResult(OutputFormatterCanWriteContext context)
+            public override Encoding SelectCharacterEncoding(OutputFormatterWriteContext context)
             {
-                // Do not set the selected media Type.
-                // The WriteResponseHeaders should do it for you.
-                return true;
-            }
-
-            public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-            {
-                return Task.FromResult(true);
-            }
-        }
-
-        private class PngImageFormatter : TextOutputFormatter
-        {
-            public PngImageFormatter()
-            {
-                SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("image/png"));
-                SupportedEncodings.Add(Encoding.UTF8);
+                return _encoding;
             }
 
             public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)

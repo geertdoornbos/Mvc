@@ -1484,11 +1484,11 @@ namespace Microsoft.AspNetCore.Mvc.Description
             }
         }
 
-        private class MockOutputFormatter : TextOutputFormatter
+        private class MockOutputFormatter : OutputFormatter
         {
             public List<Type> SupportedTypes { get; } = new List<Type>();
 
-            public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
+            public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
             {
                 throw new NotImplementedException();
             }

@@ -46,11 +46,16 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
             return false;
         }
 
-        public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
+        public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding encoding)
         {
             if (context == null)
             {
                 throw new ArgumentNullException(nameof(context));
+            }
+
+            if (encoding == null)
+            {
+                throw new ArgumentNullException(nameof(encoding));
             }
 
             var valueAsString = (string)context.Object;
@@ -60,7 +65,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
             }
 
             var response = context.HttpContext.Response;
-            return response.WriteAsync(valueAsString, selectedEncoding);
+            return response.WriteAsync(valueAsString, encoding);
         }
     }
 }

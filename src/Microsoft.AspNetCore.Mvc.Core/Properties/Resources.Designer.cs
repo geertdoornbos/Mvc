@@ -1114,6 +1114,22 @@ namespace Microsoft.AspNetCore.Mvc.Core
             return string.Format(CultureInfo.CurrentCulture, GetString("TextInputFormatter_SupportedEncodingsMustNotBeEmpty"), p0);
         }
 
+        /// <summary>
+        /// The list of '{0}' must not be empty. Add at least one supported encoding.
+        /// </summary>
+        internal static string TextOutputFormatter_SupportedEncodingsMustNotBeEmpty
+        {
+            get { return GetString("TextOutputFormatter_SupportedEncodingsMustNotBeEmpty"); }
+        }
+
+        /// <summary>
+        /// The list of '{0}' must not be empty. Add at least one supported encoding.
+        /// </summary>
+        internal static string FormatTextOutputFormatter_SupportedEncodingsMustNotBeEmpty(object p0)
+        {
+            return string.Format(CultureInfo.CurrentCulture, GetString("TextOutputFormatter_SupportedEncodingsMustNotBeEmpty"), p0);
+        }
+
         private static string GetString(string name, params string[] formatterNames)
         {
             var value = _resourceManager.GetString(name);

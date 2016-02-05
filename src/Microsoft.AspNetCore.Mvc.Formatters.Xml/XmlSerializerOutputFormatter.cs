@@ -11,8 +11,6 @@ using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.AspNetCore.Mvc.Formatters.Xml;
 using Microsoft.AspNetCore.Mvc.Formatters.Xml.Internal;
-using Microsoft.AspNetCore.Mvc.Internal;
-using Microsoft.Net.Http.Headers;
 
 namespace Microsoft.AspNetCore.Mvc.Formatters
 {
@@ -160,6 +158,11 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
             if (context == null)
             {
                 throw new ArgumentNullException(nameof(context));
+            }
+
+            if (selectedEncoding == null)
+            {
+                throw new ArgumentNullException(nameof(selectedEncoding));
             }
 
             var response = context.HttpContext.Response;

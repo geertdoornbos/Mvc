@@ -13,14 +13,14 @@ using Microsoft.Net.Http.Headers;
 namespace Microsoft.AspNetCore.Mvc.Formatters
 {
     /// <summary>
-    /// Writes an object to the output stream.
+    /// Writes an object in a given text format to the output stream.
     /// </summary>
     public abstract class TextOutputFormatter : OutputFormatter
     {
         private IDictionary<string, string> _outputMediaTypeCache;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OutputFormatter"/> class.
+        /// Initializes a new instance of the <see cref="TextOutputFormatter"/> class.
         /// </summary>
         protected TextOutputFormatter()
         {
@@ -29,7 +29,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
 
         /// <summary>
         /// Gets the mutable collection of character encodings supported by
-        /// this <see cref="OutputFormatter"/>. The encodings are
+        /// this <see cref="TextOutputFormatter"/>. The encodings are
         /// used when writing the data.
         /// </summary>
         public IList<Encoding> SupportedEncodings { get; }
@@ -69,6 +69,13 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
                 throw new ArgumentNullException(nameof(context));
             }
 
+            if (SupportedEncodings?.Count == 0)
+            {
+                var message = Resources.FormatTextOutputFormatter_SupportedEncodingsMustNotBeEmpty(
+                    nameof(SupportedEncodings));
+                throw new InvalidOperationException(message);
+            }
+
             var request = context.HttpContext.Request;
             var encoding = MatchAcceptCharacterEncoding(request.GetTypedHeaders().AcceptCharset);
             if (encoding != null)
@@ -94,7 +101,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
                 }
             }
 
-            return SupportedEncodings.Count > 0 ? SupportedEncodings[0] : null;
+            return SupportedEncodings[0];
         }
 
         /// <inheritdoc />
@@ -136,6 +143,11 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
         /// <inheritdoc />
         public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             var encoding = MediaType.GetEncoding(context.ContentType);
             await WriteResponseBodyAsync(context, encoding);
         }
@@ -144,7 +156,7 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
         /// Writes the response body.
         /// </summary>
         /// <param name="context">The formatter context associated with the call.</param>
-        /// <param name="selectedEncoding">The <see cref="Encoding"/> that should be ued to write the response.</param>
+        /// <param name="selectedEncoding">The <see cref="Encoding"/> that should be used to write the response.</param>
         /// <returns>A task which can write the response body.</returns>
         public abstract Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding);
 
@@ -152,9 +164,9 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
         {
             if (string.Equals(encoding.WebName, Encoding.UTF8.WebName, StringComparison.OrdinalIgnoreCase) &&
                 OutputMediaTypeCache.ContainsKey(mediaType))
-                {
-                    return OutputMediaTypeCache[mediaType];
-                }
+            {
+                return OutputMediaTypeCache[mediaType];
+            }
 
             return MediaType.ReplaceEncoding(mediaType, encoding);
         }

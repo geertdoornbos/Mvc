@@ -334,4 +334,7 @@
   <data name="TextInputFormatter_SupportedEncodingsMustNotBeEmpty" xml:space="preserve">
     <value>The list of '{0}' must not be empty. Add at least one supported encoding.</value>
   </data>
+  <data name="TextOutputFormatter_SupportedEncodingsMustNotBeEmpty" xml:space="preserve">
+    <value>The list of '{0}' must not be empty. Add at least one supported encoding.</value>
+  </data>
 </root>
