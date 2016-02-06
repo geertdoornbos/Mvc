@@ -37,6 +37,16 @@ namespace TagHelperSample.Web.Controllers
             return View();
         }
 
+        // GET: /Home/Create
+        public IActionResult Link()
+        {
+            var pageLink = Url.Action("Index", new { page = (string)null });
+            var otherPageLink = Url.Action("Index", new { page = (string)"1" });
+            var yetAnotherPageLink = Url.Action("Index", new { page = "" });
+            return View();
+        }
+
+
         // POST: Home/Create
         [HttpPost]
         public IActionResult Create(User user)

@@ -31,7 +31,20 @@ namespace TagHelperSample.Web
 
             app.UseStaticFiles();
 
-            app.UseMvcWithDefaultRoute();
+            app.UseMvc(routes =>
+            {
+                routes.MapAreaRoute("Admin", "Admin", "Admin/{controller}/{action}", new
+                {
+                    controller = "Admin",
+                    action = "Index"
+                });
+
+                routes.MapRoute("Default", "{controller}/{action}", new
+                {
+                    controller = "Home",
+                    action = "Index"
+                });
+            });
         }
 
         public static void Main(string[] args)
