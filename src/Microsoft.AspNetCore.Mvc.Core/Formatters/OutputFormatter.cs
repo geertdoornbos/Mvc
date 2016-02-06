@@ -79,6 +79,15 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
             string contentType,
             Type objectType)
         {
+            if (SupportedMediaTypes?.Count == 0)
+            {
+                var message = Resources.FormatFormatter_NoMediaTypes(
+                    nameof(OutputFormatter),
+                    nameof(SupportedMediaTypes));
+
+                throw new InvalidOperationException(message);
+            }
+
             if (!CanWriteType(objectType))
             {
                 return null;
@@ -164,6 +173,15 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
             if (context == null)
             {
                 throw new ArgumentNullException(nameof(context));
+            }
+
+            if (SupportedMediaTypes?.Count == 0)
+            {
+                var message = Resources.FormatFormatter_NoMediaTypes(
+                    nameof(OutputFormatter),
+                    nameof(SupportedMediaTypes));
+
+                throw new InvalidOperationException(message);
             }
 
             if (!CanWriteType(context.ObjectType))

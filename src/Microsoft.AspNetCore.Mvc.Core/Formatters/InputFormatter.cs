@@ -62,6 +62,15 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
                 return false;
             }
 
+            if (SupportedMediaTypes?.Count == 0)
+            {
+                var message = Resources.FormatFormatter_NoMediaTypes(
+                    nameof(OutputFormatter),
+                    nameof(SupportedMediaTypes));
+
+                throw new InvalidOperationException(message);
+            }
+
             var contentType = context.HttpContext.Request.ContentType;
             if (string.IsNullOrEmpty(contentType))
             {
@@ -167,6 +176,15 @@ namespace Microsoft.AspNetCore.Mvc.Formatters
             if (!CanReadType(objectType))
             {
                 return null;
+            }
+
+            if (SupportedMediaTypes?.Count == 0)
+            {
+                var message = Resources.FormatFormatter_NoMediaTypes(
+                    nameof(OutputFormatter),
+                    nameof(SupportedMediaTypes));
+
+                throw new InvalidOperationException(message);
             }
 
             if (contentType == null)
