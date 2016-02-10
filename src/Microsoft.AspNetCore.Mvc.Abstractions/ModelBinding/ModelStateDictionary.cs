@@ -692,40 +692,19 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding
                 return false;
             }
 
-            var subKeyIndex = 0;
-            if (!key.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            if (key.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
             {
-                if (key[0] == '[')
+                if (key.Length == prefix.Length)
                 {
-                    subKeyIndex = key.IndexOf('.') + 1;
-
-                    if (string.Compare(key, subKeyIndex, prefix, 0, prefix.Length, StringComparison.OrdinalIgnoreCase) != 0)
-                    {
-                        return false;
-                    }
-                    else if (prefix.Length == (key.Length - subKeyIndex))
-                    {
-                        // prefix == subKey
-                        return true;
-                    }
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else if (key.Length == prefix.Length)
-            {
-                // key == prefix
-                return true;
-            }
-
-            var charAfterPrefix = key[subKeyIndex + prefix.Length];
-            switch (charAfterPrefix)
-            {
-                case '[':
-                case '.':
+                    // Exact match
                     return true;
+                }
+
+                var charAfterPrefix = key[prefix.Length];
+                if (charAfterPrefix == '.' || charAfterPrefix == '[')
+                {
+                    return true;
+                }
             }
 
             return false;

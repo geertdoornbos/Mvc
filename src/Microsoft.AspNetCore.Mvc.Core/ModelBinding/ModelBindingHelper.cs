@@ -516,7 +516,7 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding
 
             // Clear ModelStateDictionary entries for the model so that it will be re-validated.
             var modelState = actionContext.ModelState;
-            ClearValidationStateForModel(modelType, modelState, metadataProvider, prefix);
+            ClearValidationStateForModel(modelMetadata, modelState, prefix);
 
             var operationBindingContext = new OperationBindingContext
             {
@@ -636,27 +636,21 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding
         /// Clears <see cref="ModelStateDictionary"/> entries for <see cref="ModelMetadata"/>.
         /// </summary>
         /// <param name="modelMetadata">The <see cref="ModelMetadata"/>.</param>
+        /// <param name="modelstate">The <see cref="ModelStateDictionary"/>.</param>
         /// <param name="modelKey">The entry to clear. </param>
-        /// <param name="modelMetadataProvider">The <see cref="IModelMetadataProvider"/>.</param>
         public static void ClearValidationStateForModel(
-            Type modelType,
+            ModelMetadata modelMetadata,
             ModelStateDictionary modelstate,
-            IModelMetadataProvider metadataProvider,
             string modelKey)
         {
-            if (modelType == null)
+            if (modelMetadata == null)
             {
-                throw new ArgumentNullException(nameof(modelType));
+                throw new ArgumentNullException(nameof(modelMetadata));
             }
 
             if (modelstate == null)
             {
                 throw new ArgumentNullException(nameof(modelstate));
-            }
-
-            if (metadataProvider == null)
-            {
-                throw new ArgumentNullException(nameof(metadataProvider));
             }
 
             // If modelkey is empty, we need to iterate through properties (obtained from ModelMetadata) and
@@ -665,17 +659,25 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding
             // that start with modelKey
             if (string.IsNullOrEmpty(modelKey))
             {
-                var modelMetadata = metadataProvider.GetMetadataForType(modelType);
-                var elementMetadata = modelMetadata.ElementMetadata;
-                if (elementMetadata != null)
+                if (modelMetadata.IsCollectionType)
                 {
-                    modelMetadata = elementMetadata;
+                    foreach (var kvp in modelstate)
+                    {
+                        if (kvp.Key.Length > 0 && kvp.Key[0] == '[')
+                        {
+                            // Starts with an indexer
+                            kvp.Value.Errors.Clear();
+                            kvp.Value.ValidationState = ModelValidationState.Unvalidated;
+                        }
+                    }
                 }
-
-                foreach (var property in modelMetadata.Properties)
+                else if (modelMetadata.IsComplexType)
                 {
-                    var childKey = property.BinderModelName ?? property.PropertyName;
-                    modelstate.ClearValidationState(childKey);
+                    foreach (var property in modelMetadata.Properties)
+                    {
+                        var childKey = property.BinderModelName ?? property.PropertyName;
+                        modelstate.ClearValidationState(childKey);
+                    }
                 }
             }
             else

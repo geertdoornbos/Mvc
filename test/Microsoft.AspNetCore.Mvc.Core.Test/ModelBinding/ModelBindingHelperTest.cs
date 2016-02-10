@@ -691,6 +691,8 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding
         {
             // Arrange
             var metadataProvider = new EmptyModelMetadataProvider();
+            var modelMetadata = metadataProvider.GetMetadataForType(typeof(Product));
+
             var dictionary = new ModelStateDictionary();
             dictionary["Name"] = new ModelStateEntry { ValidationState = ModelValidationState.Invalid };
             dictionary.AddModelError("Name", "MyProperty invalid.");
@@ -700,11 +702,7 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding
             dictionary["Category"] = new ModelStateEntry { ValidationState = ModelValidationState.Valid };
 
             // Act
-            ModelBindingHelper.ClearValidationStateForModel(
-                typeof(Product),
-                dictionary,
-                metadataProvider,
-                modelKey);
+            ModelBindingHelper.ClearValidationStateForModel(modelMetadata, dictionary, modelKey);
 
             // Assert
             Assert.Equal(0, dictionary["Name"].Errors.Count);
@@ -722,6 +720,8 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding
         {
             // Arrange
             var metadataProvider = new EmptyModelMetadataProvider();
+            var modelMetadata = metadataProvider.GetMetadataForType(typeof(List<Product>));
+
             var dictionary = new ModelStateDictionary();
             dictionary["[0].Name"] = new ModelStateEntry { ValidationState = ModelValidationState.Invalid };
             dictionary.AddModelError("[0].Name", "Name invalid.");
@@ -736,11 +736,7 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding
             dictionary.AddModelError("[1].Category", "Category invalid.");
 
             // Act
-            ModelBindingHelper.ClearValidationStateForModel(
-                typeof(List<Product>),
-                dictionary,
-                metadataProvider,
-                modelKey);
+            ModelBindingHelper.ClearValidationStateForModel(modelMetadata, dictionary, modelKey);
 
             // Assert
             Assert.Equal(0, dictionary["[0].Name"].Errors.Count);
@@ -767,7 +763,8 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding
         public void ClearValidationStateForModel_NonEmtpyModelKey(string prefix)
         {
             // Arrange
-            var metadataProvider = new TestModelMetadataProvider();
+            var metadataProvider = new EmptyModelMetadataProvider();
+            var modelMetadata = metadataProvider.GetMetadataForType(typeof(Product));
 
             var dictionary = new ModelStateDictionary();
             dictionary["product.Name"] = new ModelStateEntry { ValidationState = ModelValidationState.Invalid };
@@ -787,11 +784,7 @@ namespace Microsoft.AspNetCore.Mvc.ModelBinding
             dictionary.AddModelError("product.Order[0]", "Order invalid.");
 
             // Act
-            ModelBindingHelper.ClearValidationStateForModel(
-                typeof(Product),
-                dictionary,
-                metadataProvider,
-                prefix);
+            ModelBindingHelper.ClearValidationStateForModel(modelMetadata, dictionary, prefix);
 
             // Assert
             foreach (var entry in dictionary.Keys)
